@@ -21,6 +21,7 @@ export default function Home() {
 
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ProcessResult | null>(null);
 
@@ -87,6 +88,38 @@ export default function Home() {
     await navigator.clipboard.writeText(value);
   };
 
+  const startCheckout = async () => {
+    if (!session?.access_token || !session.user.email) {
+      setError("You need a signed-in session with an email to upgrade.");
+      return;
+    }
+    setCheckoutLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId: session.access_token,
+          email: session.user.email
+        })
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.error || "Could not start checkout.");
+      }
+      if (typeof payload.url === "string" && payload.url.length > 0) {
+        window.location.href = payload.url;
+      } else {
+        throw new Error("Checkout URL missing from server response.");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Checkout failed.");
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
   return (
     <main className="mx-auto min-h-screen w-full max-w-5xl px-4 py-10">
       <div className="mb-8">
@@ -119,16 +152,26 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <p className="text-sm text-slate-300">
               Signed in as <span className="font-medium text-slate-100">{session.user.email}</span>
             </p>
-            <button
-              onClick={signOut}
-              className="rounded-md border border-slate-700 px-3 py-2 text-sm hover:bg-slate-800"
-            >
-              Sign Out
-            </button>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={startCheckout}
+                disabled={checkoutLoading}
+                className="rounded-md bg-amber-500 px-3 py-2 text-sm font-medium text-slate-950 hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {checkoutLoading ? "Redirecting…" : "Upgrade"}
+              </button>
+              <button
+                onClick={signOut}
+                className="rounded-md border border-slate-700 px-3 py-2 text-sm hover:bg-slate-800"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         )}
       </div>
