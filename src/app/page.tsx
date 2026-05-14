@@ -88,8 +88,8 @@ export default function Home() {
     await navigator.clipboard.writeText(value);
   };
 
-  const startCheckout = async () => {
-    if (!session?.access_token || !session.user.email) {
+  const handleUpgrade = async () => {
+    if (!session?.user?.id || !session.user.email) {
       setError("You need a signed-in session with an email to upgrade.");
       return;
     }
@@ -100,7 +100,7 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          sessionId: session.access_token,
+          sessionId: session.user.id,
           email: session.user.email
         })
       });
@@ -159,7 +159,7 @@ export default function Home() {
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={startCheckout}
+                onClick={handleUpgrade}
                 disabled={checkoutLoading}
                 className="rounded-md bg-amber-500 px-3 py-2 text-sm font-medium text-slate-950 hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
               >
