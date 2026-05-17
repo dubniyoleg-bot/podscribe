@@ -57,6 +57,10 @@ export default function Home() {
       setError("Please select an audio file first.");
       return;
     }
+    if (!session?.access_token) {
+      setError("Sign in to generate content.");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -68,6 +72,9 @@ export default function Home() {
 
       const response = await fetch("/api/process", {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        },
         body: formData
       });
 
