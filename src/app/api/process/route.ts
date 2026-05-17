@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requirePro } from "@/lib/require-pro";
 
 type ClaudePayload = {
   showNotes: string;
@@ -38,6 +39,11 @@ function extractJsonObject(text: string): string {
 
 export async function POST(req: Request) {
   try {
+    const proGate = await requirePro(req);
+    if (proGate instanceof NextResponse) {
+      return proGate;
+    }
+
     const openAiApiKey = process.env.OPENAI_API_KEY;
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 
