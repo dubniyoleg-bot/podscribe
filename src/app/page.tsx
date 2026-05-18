@@ -33,6 +33,13 @@ const features = [
   }
 ];
 
+const planIncludes = [
+  "Unlimited transcripts",
+  "Show notes",
+  "Social posts",
+  "Powered by AI"
+];
+
 export default function Home() {
   const [sessionReady, setSessionReady] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
@@ -220,6 +227,39 @@ export default function Home() {
                 </li>
               ))}
             </ul>
+          </div>
+        </section>
+
+        <section className="border-t border-slate-800/80 py-16">
+          <div className="mx-auto max-w-5xl px-4">
+            <h2 className="text-2xl font-bold">Pricing</h2>
+            <p className="mt-2 max-w-2xl text-slate-400">
+              One simple plan—everything you need to ship every episode.
+            </p>
+            <div className="mx-auto mt-10 max-w-md rounded-xl border border-slate-800 bg-slate-900/80 p-8 shadow-sm">
+              <p className="text-sm font-medium uppercase tracking-wide text-blue-400">Pro</p>
+              <p className="mt-3 flex items-baseline gap-1">
+                <span className="text-4xl font-bold text-slate-100">$19</span>
+                <span className="text-slate-400">/month</span>
+              </p>
+              <ul className="mt-6 space-y-3">
+                {planIncludes.map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm text-slate-300">
+                    <span className="text-emerald-400" aria-hidden="true">
+                      ✓
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                onClick={scrollToSignUp}
+                className="mt-8 w-full rounded-md bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-500"
+              >
+                Get started
+              </button>
+            </div>
           </div>
         </section>
 
